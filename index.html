@@ -1,34 +1,32 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>YouTube Thumbnail Downloader HD</title>
+<title>YouTube Thumbnail Downloader</title>
 
 <style>
 body{
-    font-family: Arial;
     background:#111;
     color:white;
     text-align:center;
+    font-family:Arial;
     padding:20px;
 }
 input{
     width:90%;
     max-width:400px;
     padding:12px;
-    border:none;
     border-radius:6px;
+    border:none;
 }
 button{
     padding:12px 20px;
     margin-top:10px;
     border:none;
     border-radius:6px;
-    background:#ff0000;
+    background:red;
     color:white;
-    font-size:16px;
 }
 img{
     margin-top:20px;
@@ -39,7 +37,7 @@ a{
     display:inline-block;
     margin-top:10px;
     padding:10px 18px;
-    background:#00c853;
+    background:green;
     color:white;
     text-decoration:none;
     border-radius:6px;
@@ -51,58 +49,60 @@ a{
 
 <h2>YouTube Thumbnail Downloader</h2>
 
-<input type="text" id="link" placeholder="Paste YouTube Video Link Here">
+<input type="text" id="link" placeholder="Paste YouTube Link">
 <br>
-<button onclick="getThumbnail()">Get Thumbnail</button>
+<button onclick="loadThumb()">Get Thumbnail</button>
 
 <br>
-<img id="thumb" src="" alt="">
+<img id="thumb">
 <br>
-<a id="downloadBtn" style="display:none;" download="thumbnail.jpg">Download Thumbnail</a>
+<a id="downloadBtn" style="display:none;" download="thumbnail.jpg">Download</a>
 
 <script>
 
-function getVideoID(url){
-    let regExp = /(?:youtube\.com.*(?:\?|&)v=|youtu\.be\/)([^&#]+)/;
-    let match = url.match(regExp);
-    return match ? match[1] : null;
+function extractID(url){
+    try{
+        if(url.includes("youtu.be/")){
+            return url.split("youtu.be/")[1].split("?")[0];
+        }
+        if(url.includes("shorts/")){
+            return url.split("shorts/")[1].split("?")[0];
+        }
+        let v = url.split("v=")[1];
+        if(v) return v.split("&")[0];
+    }catch(e){}
+    return null;
 }
 
-function getThumbnail(){
+function loadThumb(){
 
     let url = document.getElementById("link").value.trim();
-
     if(!url){
-        alert("Paste YouTube Link First");
+        alert("Paste link first");
         return;
     }
 
-    let videoID = getVideoID(url);
-
-    if(!videoID){
+    let id = extractID(url);
+    if(!id){
         alert("Invalid YouTube Link ❌");
         return;
     }
 
-    let thumbURL = "https://img.youtube.com/vi/" + videoID + "/maxresdefault.jpg";
-
     let img = document.getElementById("thumb");
-    img.src = thumbURL;
+    let hd = "https://img.youtube.com/vi/"+id+"/maxresdefault.jpg";
+    let hq = "https://img.youtube.com/vi/"+id+"/hqdefault.jpg";
+
+    img.src = hd;
 
     img.onload = function(){
-        let downloadBtn = document.getElementById("downloadBtn");
-        downloadBtn.href = thumbURL;
-        downloadBtn.style.display = "inline-block";
+        document.getElementById("downloadBtn").href = hd;
+        document.getElementById("downloadBtn").style.display="inline-block";
     }
 
     img.onerror = function(){
-        // fallback thumbnail
-        let low = "https://img.youtube.com/vi/" + videoID + "/hqdefault.jpg";
-        img.src = low;
-
-        let downloadBtn = document.getElementById("downloadBtn");
-        downloadBtn.href = low;
-        downloadBtn.style.display = "inline-block";
+        img.src = hq;
+        document.getElementById("downloadBtn").href = hq;
+        document.getElementById("downloadBtn").style.display="inline-block";
     }
 }
 
