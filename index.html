@@ -3,84 +3,148 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>YouTube Thumbnail Downloader</title>
+<title>ULTRA PRO Thumbnail Downloader</title>
 
 <style>
 body{
-  font-family: Arial;
-  background:#0f172a;
-  color:white;
+  font-family:Arial, sans-serif;
+  background:linear-gradient(135deg,#020617,#0f172a);
+  color:#fff;
   text-align:center;
-  padding:40px;
+  padding:25px;
 }
 .box{
-  background:#1e293b;
-  padding:20px;
-  border-radius:10px;
-  max-width:400px;
+  max-width:420px;
   margin:auto;
+  background:#020617;
+  padding:20px;
+  border-radius:14px;
+  box-shadow:0 0 20px rgba(0,0,0,0.6);
 }
 input{
-  width:90%;
-  padding:10px;
-  margin:10px 0;
-  border-radius:5px;
+  width:100%;
+  padding:12px;
   border:none;
+  border-radius:8px;
+  margin-top:10px;
 }
 button{
-  padding:10px 20px;
+  width:100%;
+  padding:12px;
+  margin-top:10px;
   border:none;
+  border-radius:8px;
   background:#22c55e;
-  color:white;
-  border-radius:5px;
+  color:#fff;
+  font-size:15px;
   cursor:pointer;
 }
+button:hover{
+  background:#16a34a;
+}
+.row{
+  display:flex;
+  gap:6px;
+}
+.row button{
+  flex:1;
+}
 img{
-  margin-top:20px;
-  max-width:100%;
+  width:100%;
+  margin-top:15px;
   border-radius:10px;
 }
-a{
-  display:block;
-  margin-top:10px;
-  color:#38bdf8;
+.small{
+  font-size:12px;
+  color:#94a3b8;
 }
 </style>
 </head>
 
 <body>
 
-<h1>🎬 YouTube Thumbnail Downloader</h1>
-
 <div class="box">
-<input type="text" id="url" placeholder="Paste YouTube Video URL">
-<br>
-<button onclick="getThumb()">Get Thumbnail</button>
+  <h2>🔥 ULTRA PRO Thumbnail Downloader</h2>
 
-<div id="result"></div>
+  <input type="text" id="url" placeholder="Paste YouTube Video Link">
+
+  <button onclick="loadThumb()">Get Thumbnail</button>
+
+  <div class="row">
+    <button onclick="download('maxresdefault')">HD</button>
+    <button onclick="download('hqdefault')">HQ</button>
+    <button onclick="download('mqdefault')">MQ</button>
+    <button onclick="download('sddefault')">SD</button>
+  </div>
+
+  <button onclick="copyLink()">📋 Copy Thumbnail Link</button>
+
+  <img id="thumb" style="display:none;">
+  <p class="small">HD auto fallback enabled ⚡</p>
 </div>
 
 <script>
-function getVideoID(url){
-  let regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?v=))([^#\&\?]*).*/;
-  let match = url.match(regExp);
-  return (match && match[7].length==11) ? match[7] : null;
+let videoID="";
+let currentLink="";
+
+function getID(url){
+  let reg=/(?:youtube\.com\/.*v=|youtu\.be\/)([^&]+)/;
+  let m=url.match(reg);
+  return m?m[1]:null;
 }
 
-function getThumb(){
-  let url = document.getElementById("url").value;
-  let id = getVideoID(url);
+function loadThumb(){
+  let url=document.getElementById("url").value;
+  videoID=getID(url);
 
-  if(!id){
-    document.getElementById("result").innerHTML="❌ Invalid YouTube URL";
+  if(!videoID){
+    alert("Invalid YouTube Link");
     return;
   }
 
-  let img = `https://img.youtube.com/vi/${id}/maxresdefault.jpg`;
+  let hd=`https://img.youtube.com/vi/${videoID}/maxresdefault.jpg`;
 
-  document.getElementById("result").innerHTML =
-  `<img src="${img}">
-   <a href="${img}" download>⬇ Download Thumbnail (HD)</a>`;
+  let img=new Image();
+  img.onload=function(){
+    showImg(hd);
+  };
+  img.onerror=function(){
+    let fallback=`https://img.youtube.com/vi/${videoID}/hqdefault.jpg`;
+    showImg(fallback);
+  };
+  img.src=hd;
+}
+
+function showImg(link){
+  currentLink=link;
+  let im=document.getElementById("thumb");
+  im.src=link;
+  im.style.display="block";
+}
+
+function download(size){
+  if(!videoID){
+    alert("Pehle Thumbnail Load karo");
+    return;
+  }
+
+  let link=`https://img.youtube.com/vi/${videoID}/${size}.jpg`;
+
+  let a=document.createElement("a");
+  a.href=link;
+  a.download="thumbnail.jpg";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}
+
+function copyLink(){
+  if(!currentLink){
+    alert("Thumbnail load karo pehle");
+    return;
+  }
+  navigator.clipboard.writeText(currentLink);
+  alert("Thumbnail Link Copied ✅");
 }
 </script>
 
