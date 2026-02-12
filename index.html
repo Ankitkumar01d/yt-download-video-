@@ -1,48 +1,86 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>YouTube Thumbnail Downloader</title>
+
 <style>
-body{font-family:Arial;text-align:center;background:#111;color:#fff}
-input{padding:10px;width:300px}
-button{padding:10px 20px;cursor:pointer}
-img{margin-top:20px;max-width:90%}
+body{
+  font-family: Arial;
+  background:#0f172a;
+  color:white;
+  text-align:center;
+  padding:40px;
+}
+.box{
+  background:#1e293b;
+  padding:20px;
+  border-radius:10px;
+  max-width:400px;
+  margin:auto;
+}
+input{
+  width:90%;
+  padding:10px;
+  margin:10px 0;
+  border-radius:5px;
+  border:none;
+}
+button{
+  padding:10px 20px;
+  border:none;
+  background:#22c55e;
+  color:white;
+  border-radius:5px;
+  cursor:pointer;
+}
+img{
+  margin-top:20px;
+  max-width:100%;
+  border-radius:10px;
+}
+a{
+  display:block;
+  margin-top:10px;
+  color:#38bdf8;
+}
 </style>
 </head>
 
 <body>
 
-<h2>YouTube Thumbnail Downloader</h2>
+<h1>🎬 YouTube Thumbnail Downloader</h1>
 
-<input type="text" id="url" placeholder="Paste YouTube link here">
-<br><br>
+<div class="box">
+<input type="text" id="url" placeholder="Paste YouTube Video URL">
+<br>
 <button onclick="getThumb()">Get Thumbnail</button>
 
-<br>
-<img id="thumb" src="">
-<br>
-<a id="downloadBtn" style="display:none;color:yellow" download>Download Thumbnail</a>
+<div id="result"></div>
+</div>
 
 <script>
-function getThumb(){
-let url=document.getElementById("url").value;
-let id="";
-
-if(url.includes("v=")){
-  id=url.split("v=")[1].split("&")[0];
-}else if(url.includes("youtu.be/")){
-  id=url.split("youtu.be/")[1].split("?")[0];
-}else{
-  alert("Invalid YouTube Link");
-  return;
+function getVideoID(url){
+  let regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?v=))([^#\&\?]*).*/;
+  let match = url.match(regExp);
+  return (match && match[7].length==11) ? match[7] : null;
 }
 
-let thumb="https://img.youtube.com/vi/"+id+"/maxresdefault.jpg";
+function getThumb(){
+  let url = document.getElementById("url").value;
+  let id = getVideoID(url);
 
-document.getElementById("thumb").src=thumb;
-let btn=document.getElementById("downloadBtn");
-btn.href=thumb;
-btn.style.display="block";
+  if(!id){
+    document.getElementById("result").innerHTML="❌ Invalid YouTube URL";
+    return;
+  }
+
+  let img = `https://img.youtube.com/vi/${id}/maxresdefault.jpg`;
+
+  document.getElementById("result").innerHTML =
+  `<img src="${img}">
+   <a href="${img}" download>⬇ Download Thumbnail (HD)</a>`;
 }
 </script>
 
