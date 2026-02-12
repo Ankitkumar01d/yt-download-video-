@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>YouTube Thumbnail Downloader</title>
+<style>
+body {
+  font-family: Arial;
+  text-align: center;
+  background: #111;
+  color: white;
+}
+input {
+  padding: 10px;
+  width: 300px;
+}
+button {
+  padding: 10px 20px;
+  cursor: pointer;
+}
+img {
+  margin-top: 20px;
+  max-width: 90%;
+}
+</style>
+</head>
+
+<body>
+
+<h2>YouTube Thumbnail Downloader</h2>
+
+<input type="text" id="ytlink" placeholder="Paste YouTube Link">
+<br><br>
+<button onclick="getThumbnail()">Get Thumbnail</button>
+
+<br>
+<img id="thumb" src="">
+<br>
+<a id="downloadBtn" style="display:none;" download="thumbnail.jpg">Download Thumbnail</a>
+
+<script>
+function getThumbnail() {
+  let url = document.getElementById("ytlink").value;
+
+  let videoId = url.split("v=")[1];
+  if (!videoId) {
+    alert("Invalid YouTube Link");
+    return;
+  }
+
+  let ampersand = videoId.indexOf("&");
+  if (ampersand != -1) {
+    videoId = videoId.substring(0, ampersand);
+  }
+
+  let thumbUrl = "https://img.youtube.com/vi/" + videoId + "/maxresdefault.jpg";
+
+  document.getElementById("thumb").src = thumbUrl;
+
+  let downloadBtn = document.getElementById("downloadBtn");
+  downloadBtn.href = thumbUrl;
+  downloadBtn.style.display = "inline";
+  downloadBtn.innerText = "Download Thumbnail";
+}
+</script>
+
+</body>
+</html>
