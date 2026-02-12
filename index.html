@@ -3,149 +3,109 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ULTRA PRO Thumbnail Downloader</title>
+
+<title>YouTube Thumbnail Downloader HD</title>
 
 <style>
 body{
-  font-family:Arial, sans-serif;
-  background:linear-gradient(135deg,#020617,#0f172a);
-  color:#fff;
-  text-align:center;
-  padding:25px;
-}
-.box{
-  max-width:420px;
-  margin:auto;
-  background:#020617;
-  padding:20px;
-  border-radius:14px;
-  box-shadow:0 0 20px rgba(0,0,0,0.6);
+    font-family: Arial;
+    background:#111;
+    color:white;
+    text-align:center;
+    padding:20px;
 }
 input{
-  width:100%;
-  padding:12px;
-  border:none;
-  border-radius:8px;
-  margin-top:10px;
+    width:90%;
+    max-width:400px;
+    padding:12px;
+    border:none;
+    border-radius:6px;
 }
 button{
-  width:100%;
-  padding:12px;
-  margin-top:10px;
-  border:none;
-  border-radius:8px;
-  background:#22c55e;
-  color:#fff;
-  font-size:15px;
-  cursor:pointer;
-}
-button:hover{
-  background:#16a34a;
-}
-.row{
-  display:flex;
-  gap:6px;
-}
-.row button{
-  flex:1;
+    padding:12px 20px;
+    margin-top:10px;
+    border:none;
+    border-radius:6px;
+    background:#ff0000;
+    color:white;
+    font-size:16px;
 }
 img{
-  width:100%;
-  margin-top:15px;
-  border-radius:10px;
+    margin-top:20px;
+    max-width:95%;
+    border-radius:8px;
 }
-.small{
-  font-size:12px;
-  color:#94a3b8;
+a{
+    display:inline-block;
+    margin-top:10px;
+    padding:10px 18px;
+    background:#00c853;
+    color:white;
+    text-decoration:none;
+    border-radius:6px;
 }
 </style>
 </head>
 
 <body>
 
-<div class="box">
-  <h2>🔥 ULTRA PRO Thumbnail Downloader</h2>
+<h2>YouTube Thumbnail Downloader</h2>
 
-  <input type="text" id="url" placeholder="Paste YouTube Video Link">
+<input type="text" id="link" placeholder="Paste YouTube Video Link Here">
+<br>
+<button onclick="getThumbnail()">Get Thumbnail</button>
 
-  <button onclick="loadThumb()">Get Thumbnail</button>
-
-  <div class="row">
-    <button onclick="download('maxresdefault')">HD</button>
-    <button onclick="download('hqdefault')">HQ</button>
-    <button onclick="download('mqdefault')">MQ</button>
-    <button onclick="download('sddefault')">SD</button>
-  </div>
-
-  <button onclick="copyLink()">📋 Copy Thumbnail Link</button>
-
-  <img id="thumb" style="display:none;">
-  <p class="small">HD auto fallback enabled ⚡</p>
-</div>
+<br>
+<img id="thumb" src="" alt="">
+<br>
+<a id="downloadBtn" style="display:none;" download="thumbnail.jpg">Download Thumbnail</a>
 
 <script>
-let videoID="";
-let currentLink="";
 
-function getID(url){
-  let reg=/(?:youtube\.com\/.*v=|youtu\.be\/)([^&]+)/;
-  let m=url.match(reg);
-  return m?m[1]:null;
+function getVideoID(url){
+    let regExp = /(?:youtube\.com.*(?:\?|&)v=|youtu\.be\/)([^&#]+)/;
+    let match = url.match(regExp);
+    return match ? match[1] : null;
 }
 
-function loadThumb(){
-  let url=document.getElementById("url").value;
-  videoID=getID(url);
+function getThumbnail(){
 
-  if(!videoID){
-    alert("Invalid YouTube Link");
-    return;
-  }
+    let url = document.getElementById("link").value.trim();
 
-  let hd=`https://img.youtube.com/vi/${videoID}/maxresdefault.jpg`;
+    if(!url){
+        alert("Paste YouTube Link First");
+        return;
+    }
 
-  let img=new Image();
-  img.onload=function(){
-    showImg(hd);
-  };
-  img.onerror=function(){
-    let fallback=`https://img.youtube.com/vi/${videoID}/hqdefault.jpg`;
-    showImg(fallback);
-  };
-  img.src=hd;
+    let videoID = getVideoID(url);
+
+    if(!videoID){
+        alert("Invalid YouTube Link ❌");
+        return;
+    }
+
+    let thumbURL = "https://img.youtube.com/vi/" + videoID + "/maxresdefault.jpg";
+
+    let img = document.getElementById("thumb");
+    img.src = thumbURL;
+
+    img.onload = function(){
+        let downloadBtn = document.getElementById("downloadBtn");
+        downloadBtn.href = thumbURL;
+        downloadBtn.style.display = "inline-block";
+    }
+
+    img.onerror = function(){
+        // fallback thumbnail
+        let low = "https://img.youtube.com/vi/" + videoID + "/hqdefault.jpg";
+        img.src = low;
+
+        let downloadBtn = document.getElementById("downloadBtn");
+        downloadBtn.href = low;
+        downloadBtn.style.display = "inline-block";
+    }
 }
 
-function showImg(link){
-  currentLink=link;
-  let im=document.getElementById("thumb");
-  im.src=link;
-  im.style.display="block";
-}
-
-function download(size){
-  if(!videoID){
-    alert("Pehle Thumbnail Load karo");
-    return;
-  }
-
-  let link=`https://img.youtube.com/vi/${videoID}/${size}.jpg`;
-
-  let a=document.createElement("a");
-  a.href=link;
-  a.download="thumbnail.jpg";
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-}
-
-function copyLink(){
-  if(!currentLink){
-    alert("Thumbnail load karo pehle");
-    return;
-  }
-  navigator.clipboard.writeText(currentLink);
-  alert("Thumbnail Link Copied ✅");
-}
 </script>
 
 </body>
